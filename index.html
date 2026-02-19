@@ -421,8 +421,8 @@
     <button id="btnQuickLoad" class="secondary" disabled>Načíst rychle</button>
     <button id="btnQuickClear" class="danger" disabled>Smazat rychlé uložení</button>
 
-    <button id="btnSaveState" class="secondary" disabled>Uložit stav (soubor)</button>
-    <button id="btnLoadState" class="secondary">Nahrát stav (soubor)</button>
+    <button id="btnSaveState" class="secondary" disabled>Uložit soubor</button>
+    <button id="btnLoadState" class="secondary">Nahrát soubor</button>
     <input id="fileState" type="file" accept="application/json" style="display:none" />
 
     <button id="btnResetSchedules" class="warn" disabled>Vyprázdnit rozpisy (všechny dny)</button>
@@ -440,15 +440,15 @@
 
   <div class="panel controls">
     <div>
-      <label for="filterClass">Zásobník – třída</label>
+      <label for="filterClass">Kartičky – třída</label>
       <select id="filterClass"><option value="">Všechny třídy</option></select>
     </div>
     <div>
-      <label for="filterSubject">Zásobník – předmět</label>
+      <label for="filterSubject">Kartičky – předmět</label>
       <select id="filterSubject"><option value="">Všechny předměty</option></select>
     </div>
     <div>
-      <label for="filterTeacher">Zásobník – vyučující</label>
+      <label for="filterTeacher">Kartičky – učitel</label>
       <select id="filterTeacher"><option value="">Všichni vyučující</option></select>
     </div>
     <div>
@@ -465,7 +465,7 @@
   <div class="quad">
     <section class="panel">
       <div class="zoneHead">
-        <div class="zoneTitle" id="poolTitleA">Zásobník – třída A</div>
+        <div class="zoneTitle" id="poolTitleA">Kartičky – třída A</div>
         <div class="pills">
           <span class="pill">Vidím: <span id="kpiVisible">0</span></span>
           <span class="pill">Celkem: <span id="kpiTotal">0</span></span>
@@ -478,7 +478,7 @@
 
     <section class="panel">
       <div class="zoneHead">
-        <div class="zoneTitle" id="poolTitleB">Zásobník – třída B</div>
+        <div class="zoneTitle" id="poolTitleB">Kartičky – třída B</div>
       </div>
       <div id="poolB" class="list poolList" data-pool-list="B">
         <div class="empty" id="poolEmptyB">Zatím tu nic není.</div>
