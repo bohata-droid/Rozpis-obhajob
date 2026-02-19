@@ -1,0 +1,1906 @@
+<!doctype html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Rozpis maturit – 2 dny</title>
+  <style>
+    :root{
+      --bg:#f6f7fb;
+      --panel:#ffffff;
+      --text:#0f172a;
+      --muted:#475569;
+      --line:#e2e8f0;
+
+      --accent:#2563eb;
+      --accentSoft:#dbeafe;
+
+      --shadow: 0 10px 22px rgba(15, 23, 42, .08);
+      --shadow2: 0 6px 16px rgba(15, 23, 42, .06);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+      background: radial-gradient(1200px 600px at 20% -10%, #eef2ff 0%, transparent 60%),
+                  radial-gradient(1200px 600px at 90% 0%, #e0f2fe 0%, transparent 55%),
+                  var(--bg);
+      color:var(--text);
+    }
+    header{
+      position:sticky; top:0; z-index:10;
+      backdrop-filter: blur(8px);
+      background: rgba(246,247,251,.82);
+      border-bottom:1px solid var(--line);
+    }
+    .wrap{max-width:1400px; margin:0 auto; padding:12px 14px;}
+    h1{margin:0; font-size:16px; font-weight:900; letter-spacing:.2px}
+    main{max-width:1400px; margin:0 auto; padding:12px 14px 18px;}
+
+    .topbar{display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:12px;}
+    button{
+      border:1px solid var(--line);
+      background: linear-gradient(180deg, #fff, #f8fafc);
+      color:var(--text);
+      padding:9px 11px;
+      border-radius:12px;
+      cursor:pointer;
+      font-weight:850;
+      font-size:12.5px;
+      box-shadow: var(--shadow2);
+    }
+    button.primary{
+      background: linear-gradient(180deg, #2563eb, #1d4ed8);
+      border-color: #1d4ed8;
+      color:white;
+    }
+    button.good{
+      background: linear-gradient(180deg, #22c55e, #16a34a);
+      border-color: #16a34a;
+      color:white;
+    }
+    button.secondary{ background: linear-gradient(180deg, #fff, #f1f5f9); }
+    button.warn{
+      background: linear-gradient(180deg, #fb923c, #ea580c);
+      border-color:#ea580c;
+      color:white;
+    }
+    button.danger{
+      background: linear-gradient(180deg, #ef4444, #dc2626);
+      border-color:#dc2626;
+      color:white;
+    }
+    button:disabled{opacity:.5; cursor:not-allowed; box-shadow:none}
+
+    .panel{
+      background:var(--panel);
+      border:1px solid var(--line);
+      border-radius:16px;
+      box-shadow: var(--shadow);
+      padding:12px;
+    }
+
+    .controls{
+      display:grid;
+      gap:10px;
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+      align-items:end;
+      margin-bottom:12px;
+    }
+    @media (max-width: 1080px){ .controls{grid-template-columns: 1fr 1fr;} }
+    @media (max-width: 640px){ .controls{grid-template-columns: 1fr;} }
+
+    label{display:block; font-size:11.5px; color:var(--muted); margin-bottom:6px; font-weight:700}
+    input[type="time"], select{
+      width:100%;
+      border:1px solid var(--line);
+      border-radius:12px;
+      padding:9px 10px;
+      background:#fff;
+      color:var(--text);
+      font-size:12.5px;
+      outline:none;
+    }
+    input[type="time"]:focus, select:focus{
+      border-color:#93c5fd;
+      box-shadow: 0 0 0 4px rgba(59,130,246,.15);
+    }
+
+    .zoneHead{
+      display:flex; justify-content:space-between; align-items:center; gap:10px;
+      margin-bottom:8px;
+    }
+    .zoneTitle{font-size:13px; font-weight:950; margin:0}
+    .pills{display:flex; gap:8px; flex-wrap:wrap; align-items:center;}
+    .pill{
+      border:1px solid var(--line);
+      background:#f8fafc;
+      padding:6px 9px;
+      border-radius:999px;
+      font-size:12px;
+      color:var(--muted);
+      font-weight:700;
+    }
+
+    .list{
+      display:flex; flex-direction:column; gap:8px;
+      min-height:180px;
+      padding:10px;
+      border:1px solid var(--line);
+      border-radius:16px;
+      background:#fbfdff;
+    }
+    .empty{
+      padding:12px;
+      border:1px dashed #cbd5e1;
+      border-radius:14px;
+      color:var(--muted);
+      background:#fff;
+      font-size:12.5px;
+    }
+
+    /* ===== KARTIČKA: 2 řádky + poznámka ===== */
+    .card{
+      position:relative;
+      display:grid;
+      grid-template-columns: 20px 1fr;
+      gap:8px;
+      align-items:start;
+      padding:7px 44px 7px 10px;
+      border-radius:14px;
+      border: 1px solid var(--card-border, #dbe3ef);
+      background: linear-gradient(180deg,
+        var(--card-bg, #ffffff),
+        var(--card-bg2, #f8fafc)
+      );
+      box-shadow: 0 6px 12px rgba(15,23,42,.05);
+      user-select:none;
+    }
+    .actions{
+      position:absolute;
+      right:8px;
+      top:7px;
+      display:flex;
+      gap:6px;
+      align-items:center;
+    }
+    .actions.stack{flex-direction:column}
+    .small{
+      padding:6px 8px;
+      border-radius:12px;
+      border:1px solid var(--line);
+      background:#fff;
+      font-weight:950;
+      cursor:pointer;
+      box-shadow: 0 4px 10px rgba(15,23,42,.06);
+    }
+
+    .drag{
+      width:20px; height:20px;
+      border-radius:10px;
+      display:grid; place-items:center;
+      border:1px solid var(--line);
+      background:#fff;
+      color:#64748b;
+      font-size:13px;
+      margin-top:1px;
+    }
+
+    .titleRow{
+      display:flex; align-items:center; gap:7px;
+      min-width:0;
+    }
+    .title{
+      font-size:12.5px;
+      font-weight:950;
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+      min-width:0;
+    }
+    .timeBadge{
+      font-size:11.5px;
+      font-weight:950;
+      padding:3px 7px;
+      border-radius:999px;
+      border:1px solid #c7d2fe;
+      background:#eef2ff;
+      color:#3730a3;
+      flex:0 0 auto;
+      white-space:nowrap;
+    }
+    .durBadge{
+      font-size:11.5px;
+      font-weight:950;
+      padding:3px 7px;
+      border-radius:999px;
+      border:1px solid #fed7aa;
+      background:#ffedd5;
+      color:#9a3412;
+      flex:0 0 auto;
+      white-space:nowrap;
+    }
+
+    .meta{
+      display:flex; gap:6px; flex-wrap:wrap;
+      margin-top:4px;
+      font-size:11.5px;
+      color:var(--muted);
+    }
+
+    .tag{
+      padding:2px 7px;
+      border-radius:999px;
+      border:1px solid #bfdbfe;
+      background: var(--accentSoft);
+      color:#1e40af;
+      font-weight:800;
+      max-width:100%;
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    }
+    .tag.gray{
+      border-color:#e2e8f0;
+      background:#f1f5f9;
+      color:#334155;
+      font-weight:800;
+    }
+    .tag.class{
+      border-color:#bbf7d0;
+      background: #dcfce7;
+      color:#166534;
+    }
+
+    .note{
+      margin-top:6px;
+      font-size:12px;
+      line-height:1.25;
+      color:#334155;
+      background:#f8fafc;
+      border:1px solid #e2e8f0;
+      border-radius:12px;
+      padding:6px 8px;
+      white-space:pre-wrap;
+      word-break:break-word;
+    }
+
+    .card[draggable="true"]{cursor:grab}
+    .card.dragging{opacity:.55}
+    .drop-target{outline:2px solid rgba(37,99,235,.35)}
+    .drop-zone{outline:2px dashed rgba(37,99,235,.35)}
+
+    .conflict{
+      border-color: rgba(220,38,38,.5) !important;
+      background: linear-gradient(180deg, #fff, #fff5f5) !important;
+    }
+    .confBadge{
+      font-size:11px;
+      font-weight:950;
+      padding:3px 7px;
+      border-radius:999px;
+      border:1px solid rgba(220,38,38,.35);
+      background: #fee2e2;
+      color: #dc2626;
+      flex:0 0 auto;
+      white-space:nowrap;
+    }
+
+    .confPanel{
+      display:none;
+      margin-bottom:12px;
+      border:1px solid rgba(220,38,38,.25);
+      background: linear-gradient(180deg, #fff, #fff5f5);
+      border-radius:16px;
+      padding:12px;
+      box-shadow: var(--shadow2);
+    }
+    .confPanel.show{display:block}
+    .confTitle{font-weight:950; font-size:13px; margin:0 0 6px}
+    .confList{margin:0; padding-left:18px; color:#7f1d1d; font-size:12.5px; line-height:1.35}
+    .confList li{margin:4px 0}
+
+    details{
+      border:1px solid var(--line);
+      border-radius:16px;
+      background:var(--panel);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    summary{
+      list-style:none;
+      cursor:pointer;
+      padding:10px 12px;
+      display:flex; justify-content:space-between; align-items:center; gap:10px;
+      font-weight:950;
+      font-size:12.5px;
+    }
+    summary::-webkit-details-marker{display:none}
+    .sumMeta{font-size:12px; color:var(--muted); font-weight:800}
+    .detailBody{padding:12px; border-top:1px solid var(--line)}
+    textarea{
+      width:100%;
+      min-height:170px;
+      resize:vertical;
+      border-radius:14px;
+      border:1px dashed #cbd5e1;
+      padding:10px 12px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size:12px;
+      line-height:1.35;
+      outline:none;
+      background:#fff;
+    }
+
+    .toast{
+      position:fixed; bottom:16px; left:50%; transform:translateX(-50%);
+      background:#0f172a;
+      color:white;
+      padding:10px 12px;
+      border-radius:14px;
+      font-size:13px;
+      font-weight:800;
+      box-shadow: 0 14px 26px rgba(15,23,42,.25);
+      display:none;
+      max-width:min(860px, calc(100vw - 24px));
+      z-index:20;
+    }
+    .toast.show{display:block}
+
+    .quad{
+      display:grid;
+      grid-template-columns: repeat(4, minmax(260px, 1fr));
+      gap:12px;
+      align-items:start;
+    }
+    @media (max-width: 1200px){
+      .quad{grid-template-columns: repeat(2, minmax(260px, 1fr));}
+    }
+    .stackCol{
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+
+    .schedTools{
+      display:flex;
+      gap:10px;
+      align-items:end;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+    .schedTimeBox{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      min-width:160px;
+    }
+    .schedTimeBox label{margin:0}
+
+    .dayPill{
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background:#fff;
+      font-size:12px;
+      font-weight:900;
+      color:#0f172a;
+      box-shadow: var(--shadow2);
+    }
+
+    .blkHead{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+    .blkToggle{
+      border:1px solid var(--line);
+      background:#fff;
+      border-radius:999px;
+      padding:6px 10px;
+      font-size:12px;
+      font-weight:950;
+      cursor:pointer;
+      box-shadow: var(--shadow2);
+      white-space:nowrap;
+    }
+    .blkBody.hidden{ display:none; }
+    .blkCompact .zoneHead{ margin-bottom:0; }
+  </style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <h1>Rozpis maturit</h1>
+  </div>
+</header>
+
+<main>
+  <div class="topbar">
+    <button id="btnPasteToInput" class="primary">Vložit tabulku ze schránky</button>
+    <button id="btnBuild" class="secondary">Vytvořit zásobník</button>
+
+    <button id="btnQuickSave" class="good" disabled>Uložit rychle</button>
+    <button id="btnQuickLoad" class="secondary" disabled>Načíst rychle</button>
+    <button id="btnQuickClear" class="danger" disabled>Smazat rychlé uložení</button>
+
+    <button id="btnSaveState" class="secondary" disabled>Uložit stav (soubor)</button>
+    <button id="btnLoadState" class="secondary">Nahrát stav (soubor)</button>
+    <input id="fileState" type="file" accept="application/json" style="display:none" />
+
+    <button id="btnResetSchedules" class="warn" disabled>Vyprázdnit rozpisy (všechny dny)</button>
+    <button id="btnExportPanel" class="secondary" disabled>Export</button>
+    <button id="btnInputPanel" class="secondary">Vstup</button>
+
+    <span class="dayPill">
+      Den:
+      <select id="daySelect" style="width:auto; display:inline-block; padding:6px 8px; margin-left:6px; border-radius:999px;">
+        <option value="D1">1. den</option>
+        <option value="D2">2. den</option>
+      </select>
+    </span>
+  </div>
+
+  <div class="panel controls">
+    <div>
+      <label for="filterClass">Zásobník – třída</label>
+      <select id="filterClass"><option value="">Všechny třídy</option></select>
+    </div>
+    <div>
+      <label for="filterSubject">Zásobník – předmět</label>
+      <select id="filterSubject"><option value="">Všechny předměty</option></select>
+    </div>
+    <div>
+      <label for="filterTeacher">Zásobník – vyučující</label>
+      <select id="filterTeacher"><option value="">Všichni vyučující</option></select>
+    </div>
+    <div>
+      <label for="filterScheduleTeacher">Rozpis – učitel</label>
+      <select id="filterScheduleTeacher"><option value="">Bez filtru</option></select>
+    </div>
+  </div>
+
+  <div id="confPanel" class="confPanel">
+    <div class="confTitle">Kolize učitelů mezi třídami (aktuální den)</div>
+    <ul id="confList" class="confList"></ul>
+  </div>
+
+  <div class="quad">
+    <section class="panel">
+      <div class="zoneHead">
+        <div class="zoneTitle" id="poolTitleA">Zásobník – třída A</div>
+        <div class="pills">
+          <span class="pill">Vidím: <span id="kpiVisible">0</span></span>
+          <span class="pill">Celkem: <span id="kpiTotal">0</span></span>
+        </div>
+      </div>
+      <div id="poolA" class="list poolList" data-pool-list="A">
+        <div class="empty" id="poolEmptyA">Zatím tu nic není.</div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="zoneHead">
+        <div class="zoneTitle" id="poolTitleB">Zásobník – třída B</div>
+      </div>
+      <div id="poolB" class="list poolList" data-pool-list="B">
+        <div class="empty" id="poolEmptyB">Zatím tu nic není.</div>
+      </div>
+    </section>
+
+    <div class="stackCol">
+      <section class="panel blkPanel" id="schedAM_A">
+        <div class="zoneHead blkHead">
+          <div class="zoneTitle" id="schedAMTitleA">AM – třída A</div>
+          <button class="blkToggle" type="button" data-toggle="AM_A">Skrýt</button>
+        </div>
+        <div class="blkBody" data-body="AM_A">
+          <div class="zoneHead" style="margin-top:8px">
+            <div class="schedTools" style="width:100%">
+              <div class="schedTimeBox">
+                <label>Start AM</label>
+                <input type="time" id="startAM_A" value="08:00">
+              </div>
+              <div class="pills">
+                <span class="pill">V bloku: <span id="kpiAM_A">0</span></span>
+              </div>
+            </div>
+          </div>
+          <div id="listAM_A" class="list" data-schedule="" data-block="AM">
+            <div class="empty">Přetáhni sem kartičky.</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel blkPanel" id="schedPM_A">
+        <div class="zoneHead blkHead">
+          <div class="zoneTitle" id="schedPMTitleA">PM – třída A</div>
+          <button class="blkToggle" type="button" data-toggle="PM_A">Skrýt</button>
+        </div>
+        <div class="blkBody" data-body="PM_A">
+          <div class="zoneHead" style="margin-top:8px">
+            <div class="schedTools" style="width:100%">
+              <div class="schedTimeBox">
+                <label>Start PM</label>
+                <input type="time" id="startPM_A" value="13:00">
+              </div>
+              <div class="pills">
+                <span class="pill">V bloku: <span id="kpiPM_A">0</span></span>
+              </div>
+            </div>
+          </div>
+          <div id="listPM_A" class="list" data-schedule="" data-block="PM">
+            <div class="empty">Přetáhni sem kartičky.</div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div class="stackCol">
+      <section class="panel blkPanel" id="schedAM_B">
+        <div class="zoneHead blkHead">
+          <div class="zoneTitle" id="schedAMTitleB">AM – třída B</div>
+          <button class="blkToggle" type="button" data-toggle="AM_B">Skrýt</button>
+        </div>
+        <div class="blkBody" data-body="AM_B">
+          <div class="zoneHead" style="margin-top:8px">
+            <div class="schedTools" style="width:100%">
+              <div class="schedTimeBox">
+                <label>Start AM</label>
+                <input type="time" id="startAM_B" value="08:00">
+              </div>
+              <div class="pills">
+                <span class="pill">V bloku: <span id="kpiAM_B">0</span></span>
+              </div>
+            </div>
+          </div>
+          <div id="listAM_B" class="list" data-schedule="" data-block="AM">
+            <div class="empty">Přetáhni sem kartičky.</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel blkPanel" id="schedPM_B">
+        <div class="zoneHead blkHead">
+          <div class="zoneTitle" id="schedPMTitleB">PM – třída B</div>
+          <button class="blkToggle" type="button" data-toggle="PM_B">Skrýt</button>
+        </div>
+        <div class="blkBody" data-body="PM_B">
+          <div class="zoneHead" style="margin-top:8px">
+            <div class="schedTools" style="width:100%">
+              <div class="schedTimeBox">
+                <label>Start PM</label>
+                <input type="time" id="startPM_B" value="13:00">
+              </div>
+              <div class="pills">
+                <span class="pill">V bloku: <span id="kpiPM_B">0</span></span>
+              </div>
+            </div>
+          </div>
+          <div id="listPM_B" class="list" data-schedule="" data-block="PM">
+            <div class="empty">Přetáhni sem kartičky.</div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <div style="margin-top:12px; display:flex; flex-direction:column; gap:10px;">
+    <details id="inputDetails">
+      <summary>
+        <span>Vstup (TSV)</span>
+        <span class="sumMeta" id="inputMeta">skryto</span>
+      </summary>
+      <div class="detailBody">
+        <textarea id="input" placeholder="Jméno • Třída • Předmět • Zkoušející • Přísedící • Doba(min) • Poznámka"></textarea>
+      </div>
+    </details>
+
+    <details id="exportDetails">
+      <summary>
+        <span>Export (TSV)</span>
+        <span class="sumMeta" id="exportMeta">skryto</span>
+      </summary>
+      <div class="detailBody">
+        <div class="topbar" style="margin:0 0 10px; padding:0">
+          <button id="btnCopyAll" class="good" disabled>Zkopírovat export</button>
+          <button id="btnDownloadAll" class="secondary" disabled>Stáhnout .tsv</button>
+        </div>
+        <textarea id="output" readonly></textarea>
+      </div>
+    </details>
+  </div>
+</main>
+
+<div id="toast" class="toast"></div>
+
+<script>
+  const $ = (sel) => document.querySelector(sel);
+
+  const inputEl = $("#input");
+  const outputEl = $("#output");
+
+  const btnPasteToInput = $("#btnPasteToInput");
+  const btnBuild = $("#btnBuild");
+  const btnResetSchedules = $("#btnResetSchedules");
+  const btnExportPanel = $("#btnExportPanel");
+  const btnInputPanel = $("#btnInputPanel");
+
+  const btnSaveState = $("#btnSaveState");
+  const btnLoadState = $("#btnLoadState");
+  const fileState = $("#fileState");
+
+  const btnQuickSave = $("#btnQuickSave");
+  const btnQuickLoad = $("#btnQuickLoad");
+  const btnQuickClear = $("#btnQuickClear");
+
+  const btnCopyAll = $("#btnCopyAll");
+  const btnDownloadAll = $("#btnDownloadAll");
+
+  const inputDetails = $("#inputDetails");
+  const exportDetails = $("#exportDetails");
+  const inputMeta = $("#inputMeta");
+  const exportMeta = $("#exportMeta");
+
+  const filterClassEl = $("#filterClass");
+  const filterSubjectEl = $("#filterSubject");
+  const filterTeacherEl = $("#filterTeacher");
+  const filterScheduleTeacherEl = $("#filterScheduleTeacher");
+
+  const daySelect = $("#daySelect");
+  const confPanel = $("#confPanel");
+  const confList = $("#confList");
+
+  const poolA = $("#poolA"), poolB = $("#poolB");
+  const poolEmptyA = $("#poolEmptyA"), poolEmptyB = $("#poolEmptyB");
+  const poolTitleA = $("#poolTitleA"), poolTitleB = $("#poolTitleB");
+
+  const listAM_A = $("#listAM_A"), listAM_B = $("#listAM_B");
+  const listPM_A = $("#listPM_A"), listPM_B = $("#listPM_B");
+  const startAM_A = $("#startAM_A"), startAM_B = $("#startAM_B");
+  const startPM_A = $("#startPM_A"), startPM_B = $("#startPM_B");
+  const schedAMTitleA = $("#schedAMTitleA"), schedAMTitleB = $("#schedAMTitleB");
+  const schedPMTitleA = $("#schedPMTitleA"), schedPMTitleB = $("#schedPMTitleB");
+
+  const kpiVisible = $("#kpiVisible");
+  const kpiTotal = $("#kpiTotal");
+  const kpiAM_A = $("#kpiAM_A"), kpiAM_B = $("#kpiAM_B");
+  const kpiPM_A = $("#kpiPM_A"), kpiPM_B = $("#kpiPM_B");
+
+  const toastEl = $("#toast");
+  let toastTimer = null;
+  function toast(msg){
+    toastEl.textContent = msg;
+    toastEl.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(()=>toastEl.classList.remove("show"), 2300);
+  }
+
+  const DAYS = ["D1","D2"];
+  const BLOCKS = ["AM","PM"];
+  const QUICK_KEY = "maturita_rozpis_quick_v4_quad";
+  const COLLAPSE_KEY = "maturita_rozpis_collapse_v1";
+
+  let currentDay = "D1";
+  let dragSrcEl = null;
+
+  // ---------- COLLAPSE (OPRAVENO: bez neplatných \` ) ----------
+  function loadCollapseState(){
+    try{
+      const raw = localStorage.getItem(COLLAPSE_KEY);
+      if(!raw) return {};
+      const obj = JSON.parse(raw);
+      return (obj && typeof obj === "object") ? obj : {};
+    }catch{ return {}; }
+  }
+  function saveCollapseState(obj){
+    localStorage.setItem(COLLAPSE_KEY, JSON.stringify(obj));
+  }
+  function applyCollapseUI(){
+    const st = loadCollapseState();
+    document.querySelectorAll(".blkToggle").forEach(btn=>{
+      const key = btn.getAttribute("data-toggle");
+      const body = document.querySelector(`.blkBody[data-body="${key}"]`); // ✅ opraveno
+      if(!body) return;
+      const hidden = !!st[key];
+      body.classList.toggle("hidden", hidden);
+      btn.textContent = hidden ? "Zobrazit" : "Skrýt";
+      btn.closest(".blkPanel")?.classList.toggle("blkCompact", hidden);
+    });
+  }
+  function toggleBlock(key){
+    const st = loadCollapseState();
+    st[key] = !st[key];
+    saveCollapseState(st);
+    applyCollapseUI();
+  }
+  document.addEventListener("click", (e)=>{
+    const btn = e.target.closest(".blkToggle");
+    if(!btn) return;
+    toggleBlock(btn.getAttribute("data-toggle"));
+  });
+  // -----------------------------------------------------------
+
+  function updateQuickButtons(){
+    const has = !!localStorage.getItem(QUICK_KEY);
+    btnQuickLoad.disabled = !has;
+    btnQuickClear.disabled = !has;
+  }
+
+  function escapeHtml(s){
+    return String(s ?? "").replace(/[&<>"']/g, m => ({
+      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+    }[m]));
+  }
+  function norm(s){ return String(s ?? "").trim(); }
+  function normLow(s){ return norm(s).toLowerCase(); }
+
+  // pastel podle předmětu
+  const SUBJECT_PASTELS = [
+    "#e7f0ff", "#e9f7ef", "#fff1e6", "#f3e9ff", "#e8fbff",
+    "#fff6cc", "#eaf2f8", "#fce7f3", "#e9fbe7", "#fdf2f8",
+    "#eef2ff", "#f1f5f9"
+  ];
+  function hashString(str){
+    let h = 0;
+    for(let i=0;i<str.length;i++) h = (h * 31 + str.charCodeAt(i)) >>> 0;
+    return h;
+  }
+  function adjustHex(hex, amount){
+    const c = hex.replace("#","");
+    const num = parseInt(c, 16);
+    let r = (num >> 16) & 255;
+    let g = (num >> 8) & 255;
+    let b = num & 255;
+    r = Math.max(0, Math.min(255, r + amount));
+    g = Math.max(0, Math.min(255, g + amount));
+    b = Math.max(0, Math.min(255, b + amount));
+    return "#" + ((1<<24) + (r<<16) + (g<<8) + b).toString(16).slice(1);
+  }
+  function subjectToColors(subject){
+    const s = norm(subject);
+    if(!s) return null;
+    const idx = hashString(s.toLowerCase()) % SUBJECT_PASTELS.length;
+    const base = SUBJECT_PASTELS[idx];
+    return { bg: base, bg2: adjustHex(base,-8), border: adjustHex(base,-22) };
+  }
+  function applySubjectColorToCard(card, subject){
+    const c = subjectToColors(subject);
+    if(!c) return;
+    card.style.setProperty("--card-bg", c.bg);
+    card.style.setProperty("--card-bg2", c.bg2);
+    card.style.setProperty("--card-border", c.border);
+  }
+
+  function normalizeNewlines(text){
+    return text.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
+  }
+  function parseTSV(text){
+    const raw = normalizeNewlines(text).trimEnd();
+    if(!raw.trim()) return { header: null, rows: [] };
+
+    const lines = raw.split("\n").filter(l => l.trim().length > 0);
+    const table = lines.map(line => line.split("\t"));
+
+    const first = table[0].map(c => (c ?? "").trim());
+    const firstLower = first.join(" ").toLowerCase();
+    const headerWords = ["jméno","jmeno","třída","trida","předmět","predmet","zkoušející","zkousejici","přísedící","prisedici","doba","trvání","trvani","min","poznámka","poznamka","pozn."];
+
+    let header = null;
+    let rows = table;
+
+    const looksLikeHeader =
+      headerWords.some(w => firstLower.includes(w)) ||
+      (table.length >= 2 && first.every(c => /[a-zá-ž]/i.test(c) && !/^\d+$/.test(c)));
+
+    if(looksLikeHeader){
+      header = table[0];
+      rows = table.slice(1);
+    }
+    return { header, rows };
+  }
+  function toTSV(header, rows){
+    const all = [];
+    if(header && header.length) all.push(header);
+    for(const r of rows) all.push(r);
+    return all.map(r => r.map(c => c ?? "").join("\t")).join("\n");
+  }
+
+  function buildColumnMap(header){
+    const map = { name:0, class:1, subject:2, examiner:3, assistant:4, duration:5, note:6 };
+    if(!header) return map;
+
+    const h = header.map(x => normLow(x));
+    const findIdx = (preds) => {
+      for(let i=0;i<h.length;i++){
+        const cell = h[i];
+        if(preds.some(p => cell.includes(p))) return i;
+      }
+      return -1;
+    };
+
+    const iName = findIdx(["jméno","jmeno","student","žák","zak"]);
+    const iClass = findIdx(["třída","trida"]);
+    const iSubject = findIdx(["předmět","predmet","obor"]);
+    const iExaminer = findIdx(["zkoušející","zkousejici","zkousej"]);
+    const iAssistant = findIdx(["přísedící","prisedici","přísed","prised"]);
+    const iDuration = findIdx(["doba","trvání","trvani","min","minute"]);
+    const iNote = findIdx(["poznámka","poznamka","pozn."]);
+
+    if(iName>=0) map.name=iName;
+    if(iClass>=0) map.class=iClass;
+    if(iSubject>=0) map.subject=iSubject;
+    if(iExaminer>=0) map.examiner=iExaminer;
+    if(iAssistant>=0) map.assistant=iAssistant;
+    if(iDuration>=0) map.duration=iDuration;
+
+    if(iNote>=0) map.note=iNote;
+    else if(header.length >= 7) map.note = header.length - 1;
+
+    return map;
+  }
+
+  function parseDurationMinutes(v){
+    const s = normLow(v);
+    if(!s) return NaN;
+    const m = s.match(/(\d+)/);
+    if(!m) return NaN;
+    const n = parseInt(m[1],10);
+    return Number.isFinite(n) ? n : NaN;
+  }
+  function parseStartTimeToMinutes(hhmm){
+    const m = String(hhmm || "").match(/^(\d{1,2}):(\d{2})$/);
+    if(!m) return 8*60;
+    const h = parseInt(m[1],10);
+    const mi = parseInt(m[2],10);
+    if(!Number.isFinite(h) || !Number.isFinite(mi)) return 8*60;
+    return h*60 + mi;
+  }
+  function minutesToHHMM(total){
+    total = ((total % (24*60)) + (24*60)) % (24*60);
+    const h = Math.floor(total/60);
+    const m = total % 60;
+    return String(h).padStart(2,"0") + ":" + String(m).padStart(2,"0");
+  }
+  function overlap(aStart, aEnd, bStart, bEnd){
+    if(aEnd <= aStart || bEnd <= bStart) return false;
+    return aStart < bEnd && bStart < aEnd;
+  }
+
+  let state = {
+    header: null,
+    exportHeader: ["Čas"],
+    col: { name:0, class:1, subject:2, examiner:3, assistant:4, duration:5, note:6 },
+    classes: [],
+    classA: "", classB: "",
+    schedulesData: { D1:{ AM:{}, PM:{} }, D2:{ AM:{}, PM:{} } },
+    startTimes:    { D1:{ AM:{}, PM:{} }, D2:{ AM:{}, PM:{} } },
+  };
+
+  const schedLists = {
+    AM: { A: listAM_A, B: listAM_B },
+    PM: { A: listPM_A, B: listPM_B },
+  };
+
+  function updateInputMeta(){
+    const { header, rows } = parseTSV(inputEl.value);
+    inputMeta.textContent = rows.length ? `řádků: ${rows.length}${header ? " (+ hlavička)" : ""}` : "skryto";
+  }
+
+  function bindScheduleColumnsToClasses(){
+    listAM_A.setAttribute("data-schedule", state.classA || "");
+    listPM_A.setAttribute("data-schedule", state.classA || "");
+    listAM_B.setAttribute("data-schedule", state.classB || "");
+    listPM_B.setAttribute("data-schedule", state.classB || "");
+
+    poolTitleA.textContent = `Zásobník – ${state.classA || "—"}`;
+    poolTitleB.textContent = `Zásobník – ${state.classB || "—"}`;
+    schedAMTitleA.textContent = `AM – ${state.classA || "—"}`;
+    schedPMTitleA.textContent = `PM – ${state.classA || "—"}`;
+    schedAMTitleB.textContent = `AM – ${state.classB || "—"}`;
+    schedPMTitleB.textContent = `PM – ${state.classB || "—"}`;
+  }
+
+  function safeRowFromCard(card){
+    try { return JSON.parse(card.dataset.row); } catch { return null; }
+  }
+
+  function allPoolCards(){
+    return [...poolA.querySelectorAll(".card"), ...poolB.querySelectorAll(".card")];
+  }
+
+  function poolListForClass(cls){
+    if(cls === state.classA) return poolA;
+    if(cls === state.classB) return poolB;
+    return poolA;
+  }
+  function poolEmptyForClass(cls){
+    if(cls === state.classA) return poolEmptyA;
+    if(cls === state.classB) return poolEmptyB;
+    return poolEmptyA;
+  }
+
+  function updatePoolEmpties(){
+    poolEmptyA.style.display = poolA.querySelector(".card") ? "none" : "block";
+    poolEmptyB.style.display = poolB.querySelector(".card") ? "none" : "block";
+  }
+
+  function clearPool(){
+    for(const c of allPoolCards()) c.remove();
+    poolEmptyA.style.display = "block";
+    poolEmptyB.style.display = "block";
+    kpiVisible.textContent = "0";
+    kpiTotal.textContent = "0";
+  }
+
+  function removePoolCard(card){
+    card.remove();
+    rebuildPoolFiltersOptions();
+    applyPoolFilters();
+    rebuildScheduleTeacherOptions();
+    updatePoolEmpties();
+  }
+
+  function renderNoteHtml(note){
+    const n = norm(note);
+    if(!n) return "";
+    return `<div class="note">${escapeHtml(n)}</div>`;
+  }
+
+  function makePoolCard(row){
+    const name = norm(row[state.col.name]);
+    const cls  = norm(row[state.col.class]);
+    const subj = norm(row[state.col.subject]);
+    const ex   = norm(row[state.col.examiner]);
+    const as   = norm(row[state.col.assistant]);
+    const dur  = parseDurationMinutes(row[state.col.duration]);
+    const note = norm(row[state.col.note]);
+    const durText = Number.isFinite(dur) ? `${dur} min` : `? min`;
+
+    const card = document.createElement("div");
+    card.className = "card";
+    card.draggable = true;
+
+    card.dataset.row = JSON.stringify(row);
+    card.dataset.class = cls;
+    card.dataset.subject = subj;
+    card.dataset.examiner = normLow(ex);
+    card.dataset.assistant = normLow(as);
+
+    applySubjectColorToCard(card, subj);
+
+    card.innerHTML = `
+      <div class="drag">⠿</div>
+      <div>
+        <div class="titleRow">
+          <div class="title" title="${escapeHtml(name)}">${escapeHtml(name || "—")}</div>
+          <span class="durBadge" title="Délka zkoušky">${escapeHtml(durText)}</span>
+        </div>
+        <div class="meta">
+          <span class="tag class">${escapeHtml(cls || "—")}</span>
+          <span class="tag">${escapeHtml(subj || "bez předmětu")}</span>
+          ${ex ? `<span class="tag gray">zk.: ${escapeHtml(ex)}</span>` : ``}
+          ${as ? `<span class="tag gray">př.: ${escapeHtml(as)}</span>` : ``}
+        </div>
+        ${renderNoteHtml(note)}
+      </div>
+      <div class="actions">
+        <button class="small" data-act="add">＋</button>
+      </div>
+    `;
+
+    card.addEventListener("click", (e)=>{
+      const btn = e.target.closest("button[data-act='add']");
+      if(!btn) return;
+      movePoolCardToSchedule(card, {toTop:false, block:"AM"});
+    });
+    card.addEventListener("dblclick", ()=> movePoolCardToSchedule(card, {toTop:true, block:"AM"}));
+
+    attachDnD(card);
+    return card;
+  }
+
+  function makeScheduleCard(row){
+    const name = norm(row[state.col.name]);
+    const cls  = norm(row[state.col.class]);
+    const subj = norm(row[state.col.subject]);
+    const ex   = norm(row[state.col.examiner]);
+    const as   = norm(row[state.col.assistant]);
+    const dur  = parseDurationMinutes(row[state.col.duration]);
+    const note = norm(row[state.col.note]);
+    const durText = Number.isFinite(dur) ? `${dur} min` : `? min`;
+
+    const card = document.createElement("div");
+    card.className = "card";
+    card.draggable = true;
+
+    card.dataset.row = JSON.stringify(row);
+    card.dataset.class = cls;
+    card.dataset.subject = subj;
+    card.dataset.examiner = normLow(ex);
+    card.dataset.assistant = normLow(as);
+    card.dataset.duration = Number.isFinite(dur) ? String(dur) : "";
+    card.dataset.startTime = "";
+
+    applySubjectColorToCard(card, subj);
+
+    card.innerHTML = `
+      <div class="drag">⠿</div>
+      <div>
+        <div class="titleRow">
+          <div class="title" title="${escapeHtml(name)}">${escapeHtml(name || "—")}</div>
+          <span class="timeBadge" data-time>--:--</span>
+          <span class="durBadge" title="Délka zkoušky">${escapeHtml(durText)}</span>
+          <span class="confBadge" data-conf style="display:none">kolize</span>
+        </div>
+        <div class="meta">
+          <span class="tag class">${escapeHtml(cls || "—")}</span>
+          <span class="tag">${escapeHtml(subj || "bez předmětu")}</span>
+          ${ex ? `<span class="tag gray">zk.: ${escapeHtml(ex)}</span>` : ``}
+          ${as ? `<span class="tag gray">př.: ${escapeHtml(as)}</span>` : ``}
+        </div>
+        ${renderNoteHtml(note)}
+      </div>
+      <div class="actions stack">
+        <button class="small" data-act="up">⇧</button>
+        <button class="small" data-act="del">×</button>
+      </div>
+    `;
+
+    card.addEventListener("click", (e)=>{
+      const up = e.target.closest("button[data-act='up']");
+      const del = e.target.closest("button[data-act='del']");
+      if(up){
+        card.parentElement && card.parentElement.prepend(card);
+        persistDomToState();
+        recalcAll();
+      }
+      if(del){
+        moveScheduleCardBackToPool(card);
+      }
+    });
+
+    card.addEventListener("dblclick", ()=>{
+      card.parentElement && card.parentElement.prepend(card);
+      persistDomToState();
+      recalcAll();
+    });
+
+    attachDnD(card);
+    return card;
+  }
+
+  function addPoolRow(row){
+    const cls = norm(row[state.col.class]);
+    const list = poolListForClass(cls);
+    const empty = poolEmptyForClass(cls);
+
+    const card = makePoolCard(row);
+    list.appendChild(card);
+    empty.style.display = "none";
+
+    rebuildPoolFiltersOptions();
+    applyPoolFilters();
+    rebuildScheduleTeacherOptions();
+  }
+
+  function rebuildPoolFiltersOptions(){
+    const classes = new Set();
+    const subjects = new Set();
+    const teachers = new Set();
+
+    for(const c of allPoolCards()){
+      classes.add((c.dataset.class || "").trim());
+      subjects.add((c.dataset.subject || "").trim());
+      const ex = (c.dataset.examiner || "").trim();
+      const as = (c.dataset.assistant || "").trim();
+      if(ex) teachers.add(ex);
+      if(as) teachers.add(as);
+    }
+
+    const curC = filterClassEl.value;
+    const curS = filterSubjectEl.value;
+    const curT = filterTeacherEl.value;
+
+    filterClassEl.innerHTML = `<option value="">Všechny třídy</option>`;
+    [...classes].filter(Boolean).sort((a,b)=>a.localeCompare(b,"cs")).forEach(cls=>{
+      const opt = document.createElement("option");
+      opt.value = cls; opt.textContent = cls;
+      filterClassEl.appendChild(opt);
+    });
+
+    filterSubjectEl.innerHTML = `<option value="">Všechny předměty</option>`;
+    [...subjects].filter(Boolean).sort((a,b)=>a.localeCompare(b,"cs")).forEach(s=>{
+      const opt = document.createElement("option");
+      opt.value = s; opt.textContent = s;
+      filterSubjectEl.appendChild(opt);
+    });
+
+    filterTeacherEl.innerHTML = `<option value="">Všichni vyučující</option>`;
+    [...teachers].filter(Boolean).sort((a,b)=>a.localeCompare(b,"cs")).forEach(t=>{
+      const opt = document.createElement("option");
+      opt.value = t; opt.textContent = t;
+      filterTeacherEl.appendChild(opt);
+    });
+
+    filterClassEl.value = ([...filterClassEl.options].some(o=>o.value===curC)) ? curC : "";
+    filterSubjectEl.value = ([...filterSubjectEl.options].some(o=>o.value===curS)) ? curS : "";
+    filterTeacherEl.value = ([...filterTeacherEl.options].some(o=>o.value===curT)) ? curT : "";
+  }
+
+  function applyPoolFilters(){
+    const cls = filterClassEl.value.trim();
+    const subj = filterSubjectEl.value.trim();
+    const teacher = filterTeacherEl.value.trim().toLowerCase();
+
+    let visible = 0;
+    let total = 0;
+
+    for(const card of allPoolCards()){
+      total++;
+
+      const okC = !cls || (card.dataset.class || "").trim() === cls;
+      const okS = !subj || (card.dataset.subject || "").trim() === subj;
+
+      const ex = (card.dataset.examiner || "").trim();
+      const as = (card.dataset.assistant || "").trim();
+      const okT = !teacher || ex === teacher || as === teacher;
+
+      const show = okC && okS && okT;
+      card.style.display = show ? "" : "none";
+      if(show) visible++;
+    }
+
+    kpiTotal.textContent = String(total);
+    kpiVisible.textContent = String(visible);
+    updatePoolEmpties();
+  }
+
+  filterClassEl.addEventListener("change", applyPoolFilters);
+  filterSubjectEl.addEventListener("change", applyPoolFilters);
+  filterTeacherEl.addEventListener("change", applyPoolFilters);
+
+  function rebuildScheduleTeacherOptions(){
+    const teachers = new Set();
+
+    for(const c of allPoolCards()){
+      const ex = (c.dataset.examiner || "").trim();
+      const as = (c.dataset.assistant || "").trim();
+      if(ex) teachers.add(ex);
+      if(as) teachers.add(as);
+    }
+
+    for(const day of DAYS){
+      for(const block of BLOCKS){
+        const byClass = state.schedulesData[day][block];
+        for(const cls of Object.keys(byClass)){
+          for(const row of (byClass[cls] || [])){
+            const ex = normLow(row[state.col.examiner]);
+            const as = normLow(row[state.col.assistant]);
+            if(ex) teachers.add(ex);
+            if(as) teachers.add(as);
+          }
+        }
+      }
+    }
+
+    const cur = filterScheduleTeacherEl.value;
+
+    filterScheduleTeacherEl.innerHTML = `<option value="">Bez filtru</option>`;
+    [...teachers].filter(Boolean).sort((a,b)=>a.localeCompare(b,"cs")).forEach(t=>{
+      const opt = document.createElement("option");
+      opt.value = t;
+      opt.textContent = t;
+      filterScheduleTeacherEl.appendChild(opt);
+    });
+
+    filterScheduleTeacherEl.value = ([...filterScheduleTeacherEl.options].some(o=>o.value===cur)) ? cur : "";
+    applyScheduleTeacherFilter();
+  }
+
+  function applyScheduleTeacherFilter(){
+    const t = filterScheduleTeacherEl.value.trim().toLowerCase();
+    const shouldFilter = !!t;
+
+    const lists = [listAM_A, listAM_B, listPM_A, listPM_B];
+    for(const listEl of lists){
+      for(const card of listEl.querySelectorAll(".card")){
+        if(!shouldFilter){ card.style.display=""; continue; }
+        const ex = (card.dataset.examiner || "").trim();
+        const as = (card.dataset.assistant || "").trim();
+        card.style.display = (ex===t || as===t) ? "" : "none";
+      }
+    }
+  }
+  filterScheduleTeacherEl.addEventListener("change", applyScheduleTeacherFilter);
+
+  function ensureEmptyIfNone(listEl){
+    const any = listEl.querySelector(".card");
+    if(!any && !listEl.querySelector(".empty")){
+      const d = document.createElement("div");
+      d.className = "empty";
+      d.textContent = "Přetáhni sem kartičky.";
+      listEl.appendChild(d);
+    }
+  }
+  function removeEmptyIfNeeded(listEl){
+    const empty = listEl.querySelector(".empty");
+    if(empty) empty.remove();
+  }
+
+  function clearSchedulesUI(){
+    for(const listEl of [listAM_A, listAM_B, listPM_A, listPM_B]){
+      listEl.querySelectorAll(".card").forEach(n=>n.remove());
+      ensureEmptyIfNone(listEl);
+    }
+  }
+
+  function persistDomToState(){
+    if(!state.classA || !state.classB) return;
+
+    const map = [
+      {block:"AM", cls:state.classA, list:listAM_A},
+      {block:"AM", cls:state.classB, list:listAM_B},
+      {block:"PM", cls:state.classA, list:listPM_A},
+      {block:"PM", cls:state.classB, list:listPM_B},
+    ];
+
+    for(const m of map){
+      const rows = [];
+      for(const card of m.list.querySelectorAll(".card")){
+        const r = safeRowFromCard(card);
+        if(r) rows.push(r);
+      }
+      state.schedulesData[currentDay][m.block][m.cls] = rows;
+    }
+
+    state.startTimes[currentDay].AM[state.classA] = startAM_A.value;
+    state.startTimes[currentDay].AM[state.classB] = startAM_B.value;
+    state.startTimes[currentDay].PM[state.classA] = startPM_A.value;
+    state.startTimes[currentDay].PM[state.classB] = startPM_B.value;
+  }
+
+  function renderSchedulesForDay(day){
+    currentDay = day;
+    daySelect.value = day;
+
+    bindScheduleColumnsToClasses();
+    clearSchedulesUI();
+
+    startAM_A.value = state.startTimes[currentDay].AM[state.classA] || "08:00";
+    startAM_B.value = state.startTimes[currentDay].AM[state.classB] || "08:00";
+    startPM_A.value = state.startTimes[currentDay].PM[state.classA] || "13:00";
+    startPM_B.value = state.startTimes[currentDay].PM[state.classB] || "13:00";
+
+    const fill = (listEl, rows)=>{
+      listEl.querySelectorAll(".card").forEach(n=>n.remove());
+      if(rows.length){
+        removeEmptyIfNeeded(listEl);
+        for(const r of rows) listEl.appendChild(makeScheduleCard(r));
+      }
+      ensureEmptyIfNone(listEl);
+    };
+
+    fill(listAM_A, state.schedulesData[currentDay].AM[state.classA] || []);
+    fill(listAM_B, state.schedulesData[currentDay].AM[state.classB] || []);
+    fill(listPM_A, state.schedulesData[currentDay].PM[state.classA] || []);
+    fill(listPM_B, state.schedulesData[currentDay].PM[state.classB] || []);
+
+    rebuildScheduleTeacherOptions();
+    recalcAll();
+  }
+
+  function switchDay(day){
+    persistDomToState();
+    renderSchedulesForDay(day);
+  }
+
+  function enableAfterAnyContent(){
+    btnResetSchedules.disabled = false;
+    btnExportPanel.disabled = false;
+    btnCopyAll.disabled = false;
+    btnDownloadAll.disabled = false;
+    btnSaveState.disabled = false;
+    btnQuickSave.disabled = false;
+  }
+
+  function targetListForClassBlock(cls, block){
+    const key = (cls === state.classA) ? "A" : "B";
+    return schedLists[block][key];
+  }
+
+  function movePoolCardToSchedule(poolCard, {toTop, block}){
+    const cls = (poolCard.dataset.class || "").trim();
+    if(!cls){ toast("Kartička nemá třídu."); return; }
+    if(cls !== state.classA && cls !== state.classB){
+      toast("Třída kartičky neodpovídá sloupcům.");
+      return;
+    }
+    const list = targetListForClassBlock(cls, block);
+    const row = safeRowFromCard(poolCard);
+    if(!row) return;
+
+    removeEmptyIfNeeded(list);
+    const card = makeScheduleCard(row);
+    if(toTop) list.prepend(card); else list.appendChild(card);
+
+    removePoolCard(poolCard);
+    enableAfterAnyContent();
+    persistDomToState();
+    recalcAll();
+  }
+
+  function moveScheduleCardBackToPool(scheduleCard){
+    const row = safeRowFromCard(scheduleCard);
+    if(!row) return;
+
+    const parent = scheduleCard.closest("[data-schedule][data-block]");
+    scheduleCard.remove();
+    if(parent) ensureEmptyIfNone(parent);
+
+    addPoolRow(row);
+    persistDomToState();
+    recalcAll();
+  }
+
+  function isFromPool(el){
+    return el.closest("[data-pool-list]") != null;
+  }
+
+  function attachDnD(card){
+    card.addEventListener("dragstart", (e)=>{
+      dragSrcEl = card;
+      card.classList.add("dragging");
+      e.dataTransfer.effectAllowed = "move";
+      e.dataTransfer.setData("text/plain", "drag");
+    });
+
+    card.addEventListener("dragend", ()=>{
+      card.classList.remove("dragging");
+      dragSrcEl = null;
+      document.querySelectorAll(".drop-target").forEach(n=>n.classList.remove("drop-target"));
+      document.querySelectorAll(".drop-zone").forEach(n=>n.classList.remove("drop-zone"));
+      persistDomToState();
+      recalcAll();
+    });
+
+    card.addEventListener("dragover", (e)=>{ e.preventDefault(); e.dataTransfer.dropEffect="move"; });
+
+    card.addEventListener("dragenter", ()=>{
+      if(card !== dragSrcEl) card.classList.add("drop-target");
+    });
+    card.addEventListener("dragleave", ()=> card.classList.remove("drop-target"));
+
+    card.addEventListener("drop", (e)=>{
+      e.preventDefault();
+      e.stopPropagation();
+      card.classList.remove("drop-target");
+      if(!dragSrcEl || dragSrcEl === card) return;
+
+      const fromPool = isFromPool(dragSrcEl);
+      const targetSchedule = card.closest("[data-schedule][data-block]");
+      const sourceSchedule = dragSrcEl.closest("[data-schedule][data-block]");
+      if(!targetSchedule) return;
+
+      const targetCls = (targetSchedule.getAttribute("data-schedule") || "").trim();
+      const rect = card.getBoundingClientRect();
+      const before = (e.clientY - rect.top) < rect.height / 2;
+
+      if(fromPool){
+        const cardClass = (dragSrcEl.dataset.class || "").trim();
+        if(cardClass !== targetCls){
+          toast("Kartička patří do jiné třídy.");
+          return;
+        }
+        const row = safeRowFromCard(dragSrcEl);
+        if(!row) return;
+
+        const newCard = makeScheduleCard(row);
+        removeEmptyIfNeeded(targetSchedule);
+        if(before) targetSchedule.insertBefore(newCard, card);
+        else targetSchedule.insertBefore(newCard, card.nextSibling);
+
+        removePoolCard(dragSrcEl);
+        enableAfterAnyContent();
+        persistDomToState();
+        recalcAll();
+        return;
+      }
+
+      if(!sourceSchedule) return;
+      const srcCls = (sourceSchedule.getAttribute("data-schedule") || "").trim();
+      if(srcCls !== targetCls){
+        toast("Kartičku nelze přesunout do jiné třídy.");
+        return;
+      }
+      if(before) targetSchedule.insertBefore(dragSrcEl, card);
+      else targetSchedule.insertBefore(dragSrcEl, card.nextSibling);
+
+      persistDomToState();
+      recalcAll();
+    });
+  }
+
+  function attachScheduleDropZone(listEl){
+    listEl.addEventListener("dragover", (e)=>{ e.preventDefault(); listEl.classList.add("drop-zone"); });
+    listEl.addEventListener("dragleave", ()=> listEl.classList.remove("drop-zone"));
+    listEl.addEventListener("drop", (e)=>{
+      e.preventDefault();
+      listEl.classList.remove("drop-zone");
+      if(!dragSrcEl) return;
+
+      const fromPool = isFromPool(dragSrcEl);
+      const cls = (listEl.getAttribute("data-schedule") || "").trim();
+
+      if(fromPool){
+        const cardClass = (dragSrcEl.dataset.class || "").trim();
+        if(cardClass !== cls){
+          toast("Kartička patří do jiné třídy.");
+          return;
+        }
+        const row = safeRowFromCard(dragSrcEl);
+        if(!row) return;
+
+        removeEmptyIfNeeded(listEl);
+        listEl.appendChild(makeScheduleCard(row));
+        removePoolCard(dragSrcEl);
+
+        enableAfterAnyContent();
+        persistDomToState();
+        recalcAll();
+        return;
+      }
+
+      const cardClass = (dragSrcEl.dataset.class || "").trim();
+      if(cardClass !== cls){
+        toast("Kartičku nelze přesunout do jiné třídy.");
+        return;
+      }
+      removeEmptyIfNeeded(listEl);
+      listEl.appendChild(dragSrcEl);
+      persistDomToState();
+      recalcAll();
+    });
+  }
+
+  for(const el of [listAM_A, listAM_B, listPM_A, listPM_B]) attachScheduleDropZone(el);
+
+  function clearConflicts(){
+    confList.innerHTML = "";
+    confPanel.classList.remove("show");
+    document.querySelectorAll(".card.conflict").forEach(c=>c.classList.remove("conflict"));
+    document.querySelectorAll("[data-conf]").forEach(b=>b.style.display="none");
+  }
+
+  function recalcTimesForList(cls, block, listEl, startHHMM){
+    const startBase = parseStartTimeToMinutes(startHHMM);
+    const cards = [...listEl.querySelectorAll(".card")];
+
+    let t = startBase;
+    const segments = [];
+    for(const card of cards){
+      const durStr = card.dataset.duration || "";
+      const dur = parseInt(durStr,10);
+      const minutes = Number.isFinite(dur) ? dur : NaN;
+
+      const timeStr = minutesToHHMM(t);
+      card.dataset.startTime = timeStr;
+      const timeEl = card.querySelector("[data-time]");
+      if(timeEl) timeEl.textContent = timeStr;
+
+      const end = Number.isFinite(minutes) ? t + minutes : t;
+
+      const ex = (card.dataset.examiner || "").trim();
+      const as = (card.dataset.assistant || "").trim();
+      const teachers = [];
+      if(ex) teachers.push(ex);
+      if(as) teachers.push(as);
+
+      segments.push({ cls, block, card, start:t, end:end, teachers });
+      t = end;
+    }
+    return segments;
+  }
+
+  function applyTeacherConflicts(segments){
+    clearConflicts();
+    if(!segments.length) return;
+
+    const byTeacher = new Map();
+    for(const s of segments){
+      for(const t of s.teachers){
+        if(!byTeacher.has(t)) byTeacher.set(t, []);
+        byTeacher.get(t).push(s);
+      }
+    }
+
+    const conflicts = [];
+    for(const [teacher, segs] of byTeacher){
+      for(let i=0;i<segs.length;i++){
+        for(let j=i+1;j<segs.length;j++){
+          const a = segs[i], b = segs[j];
+          if(a.cls === b.cls) continue;
+          if(overlap(a.start, a.end, b.start, b.end)){
+            a.card.classList.add("conflict");
+            b.card.classList.add("conflict");
+            const ba = a.card.querySelector("[data-conf]");
+            const bb = b.card.querySelector("[data-conf]");
+            if(ba) ba.style.display = "inline-flex";
+            if(bb) bb.style.display = "inline-flex";
+            conflicts.push({
+              teacher,
+              aCls: a.cls, aBlk: a.block, aTime: `${minutesToHHMM(a.start)}–${minutesToHHMM(a.end)}`,
+              bCls: b.cls, bBlk: b.block, bTime: `${minutesToHHMM(b.start)}–${minutesToHHMM(b.end)}`
+            });
+          }
+        }
+      }
+    }
+
+    if(conflicts.length){
+      const uniq = new Map();
+      for(const c of conflicts){
+        const key = `${c.teacher}|${c.aCls}|${c.aBlk}|${c.aTime}|${c.bCls}|${c.bBlk}|${c.bTime}`;
+        uniq.set(key, c);
+      }
+      confList.innerHTML = "";
+      for(const c of uniq.values()){
+        const li = document.createElement("li");
+        li.textContent = `${c.teacher}: ${c.aCls} (${c.aBlk} ${c.aTime}) × ${c.bCls} (${c.bBlk} ${c.bTime})`;
+        confList.appendChild(li);
+      }
+      confPanel.classList.add("show");
+    }
+  }
+
+  function updateKPIs(){
+    kpiAM_A.textContent = String(listAM_A.querySelectorAll(".card").length);
+    kpiAM_B.textContent = String(listAM_B.querySelectorAll(".card").length);
+    kpiPM_A.textContent = String(listPM_A.querySelectorAll(".card").length);
+    kpiPM_B.textContent = String(listPM_B.querySelectorAll(".card").length);
+  }
+
+  function buildExport(){
+    const rowsOut = [];
+
+    for(const day of DAYS){
+      for(const block of BLOCKS){
+        for(const cls of state.classes){
+          const rows = state.schedulesData[day][block][cls] || [];
+          const start = state.startTimes[day][block][cls] || (block==="AM"?"08:00":"13:00");
+          let t = parseStartTimeToMinutes(start);
+
+          for(const row of rows){
+            const dur = parseDurationMinutes(row[state.col.duration]);
+            const timeStr = minutesToHHMM(t);
+            rowsOut.push([timeStr, ...row]);
+            if(Number.isFinite(dur)) t += dur;
+          }
+        }
+      }
+    }
+
+    outputEl.value = toTSV(state.exportHeader, rowsOut);
+
+    const any = rowsOut.length > 0;
+    btnExportPanel.disabled = !any;
+    btnCopyAll.disabled = !any;
+    btnDownloadAll.disabled = !any;
+    exportMeta.textContent = any ? `řádků: ${rowsOut.length}` : "skryto";
+  }
+
+  function recalcAll(){
+    persistDomToState();
+
+    const segs = [];
+    segs.push(...recalcTimesForList(state.classA, "AM", listAM_A, startAM_A.value));
+    segs.push(...recalcTimesForList(state.classB, "AM", listAM_B, startAM_B.value));
+    segs.push(...recalcTimesForList(state.classA, "PM", listPM_A, startPM_A.value));
+    segs.push(...recalcTimesForList(state.classB, "PM", listPM_B, startPM_B.value));
+
+    applyTeacherConflicts(segs);
+    updateKPIs();
+    buildExport();
+    applyScheduleTeacherFilter();
+  }
+
+  function collectRowsFromCards(nodeList){
+    const rows = [];
+    for(const card of nodeList){
+      const r = safeRowFromCard(card);
+      if(r) rows.push(r);
+    }
+    return rows;
+  }
+
+  function buildStateObject(){
+    persistDomToState();
+    return {
+      version: 4,
+      createdAt: new Date().toISOString(),
+      header: state.header,
+      colMap: state.col,
+      exportHeader: state.exportHeader,
+      classes: state.classes,
+      classA: state.classA,
+      classB: state.classB,
+      currentDay,
+      startTimes: state.startTimes,
+      schedulesData: state.schedulesData,
+      poolRows: collectRowsFromCards(allPoolCards()),
+      filters: {
+        poolClass: filterClassEl.value,
+        poolSubject: filterSubjectEl.value,
+        poolTeacher: filterTeacherEl.value,
+        scheduleTeacher: filterScheduleTeacherEl.value
+      }
+    };
+  }
+
+  function applyLoadedState(obj){
+    if(!obj || typeof obj !== "object") throw new Error("Neplatný soubor.");
+    if(obj.version !== 4) throw new Error("Neznámá verze stavu.");
+
+    resetAllUI();
+
+    state.header = obj.header ?? null;
+    state.col = obj.colMap ?? buildColumnMap(state.header);
+    state.exportHeader = obj.exportHeader ?? (state.header && state.header.length ? ["Čas", ...state.header] : ["Čas"]);
+    state.classes = Array.isArray(obj.classes) ? obj.classes : [];
+    state.classA = obj.classA || state.classes[0] || "";
+    state.classB = obj.classB || state.classes[1] || state.classes[0] || "";
+
+    bindScheduleColumnsToClasses();
+
+    state.startTimes = obj.startTimes ?? state.startTimes;
+    state.schedulesData = obj.schedulesData ?? state.schedulesData;
+
+    if(Array.isArray(obj.poolRows)){
+      for(const row of obj.poolRows) addPoolRow(row);
+    }
+
+    if(obj.filters){
+      filterClassEl.value = obj.filters.poolClass ?? "";
+      filterSubjectEl.value = obj.filters.poolSubject ?? "";
+      filterTeacherEl.value = obj.filters.poolTeacher ?? "";
+      filterScheduleTeacherEl.value = obj.filters.scheduleTeacher ?? "";
+    }
+
+    rebuildPoolFiltersOptions();
+    applyPoolFilters();
+
+    currentDay = obj.currentDay === "D2" ? "D2" : "D1";
+    daySelect.value = currentDay;
+
+    btnResetSchedules.disabled = false;
+    btnSaveState.disabled = false;
+    btnQuickSave.disabled = false;
+
+    renderSchedulesForDay(currentDay);
+    rebuildScheduleTeacherOptions();
+    recalcAll();
+  }
+
+  function downloadJson(filename, dataObj){
+    const text = JSON.stringify(dataObj, null, 2);
+    const blob = new Blob([text], {type:"application/json;charset=utf-8"});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  function quickSave(){
+    const obj = buildStateObject();
+    localStorage.setItem(QUICK_KEY, JSON.stringify(obj));
+    updateQuickButtons();
+    toast("Uloženo.");
+  }
+  function quickLoad(){
+    const raw = localStorage.getItem(QUICK_KEY);
+    if(!raw){ updateQuickButtons(); toast("Není co načíst."); return; }
+    try{
+      applyLoadedState(JSON.parse(raw));
+      toast("Načteno.");
+    }catch(e){
+      console.error(e);
+      toast("Rychlé uložení je poškozené.");
+    }
+  }
+  function quickClear(){
+    localStorage.removeItem(QUICK_KEY);
+    updateQuickButtons();
+    toast("Smazáno.");
+  }
+
+  function resetAllUI(){
+    clearPool();
+    clearSchedulesUI();
+    state.classes = [];
+    state.classA = ""; state.classB = "";
+
+    listAM_A.setAttribute("data-schedule", "");
+    listPM_A.setAttribute("data-schedule", "");
+    listAM_B.setAttribute("data-schedule", "");
+    listPM_B.setAttribute("data-schedule", "");
+
+    confList.innerHTML = "";
+    confPanel.classList.remove("show");
+    outputEl.value = "";
+    exportMeta.textContent = "skryto";
+
+    for(const day of DAYS){
+      for(const block of BLOCKS){
+        state.schedulesData[day][block] = {};
+        state.startTimes[day][block] = {};
+      }
+    }
+
+    btnExportPanel.disabled = true;
+    btnCopyAll.disabled = true;
+    btnDownloadAll.disabled = true;
+    btnResetSchedules.disabled = true;
+    btnSaveState.disabled = true;
+    btnQuickSave.disabled = true;
+
+    rebuildScheduleTeacherOptions();
+  }
+
+  function rebuildFromInput(){
+    resetAllUI();
+
+    const { header, rows } = parseTSV(inputEl.value);
+    state.header = header;
+    state.col = buildColumnMap(header);
+    state.exportHeader = header && header.length ? ["Čas", ...header] : ["Čas"];
+
+    const classSet = new Set();
+    for(const row of rows){
+      const cls = norm(row[state.col.class]);
+      if(cls) classSet.add(cls);
+    }
+    const classes = [...classSet].filter(Boolean).sort((a,b)=>a.localeCompare(b,"cs"));
+    state.classes = classes.slice(0,2);
+    state.classA = state.classes[0] || "";
+    state.classB = state.classes[1] || state.classes[0] || "";
+
+    bindScheduleColumnsToClasses();
+
+    for(const day of DAYS){
+      for(const block of BLOCKS){
+        for(const cls of state.classes){
+          state.schedulesData[day][block][cls] = [];
+          state.startTimes[day][block][cls] = (block==="AM" ? "08:00" : "13:00");
+        }
+      }
+    }
+
+    for(const row of rows) addPoolRow(row);
+
+    rebuildPoolFiltersOptions();
+    applyPoolFilters();
+
+    btnResetSchedules.disabled = false;
+    btnSaveState.disabled = !(rows.length > 0);
+    btnQuickSave.disabled = !(rows.length > 0);
+
+    enableAfterAnyContent();
+    renderSchedulesForDay(currentDay);
+    rebuildScheduleTeacherOptions();
+    recalcAll();
+  }
+
+  btnInputPanel.addEventListener("click", ()=>{ inputDetails.open = !inputDetails.open; });
+  btnExportPanel.addEventListener("click", ()=>{ exportDetails.open = !exportDetails.open; });
+
+  btnPasteToInput.addEventListener("click", async ()=>{
+    try{
+      const text = await navigator.clipboard.readText();
+      if(!text.trim()){ toast("Schránka je prázdná."); return; }
+      inputEl.value = text;
+      updateInputMeta();
+      inputDetails.open = true;
+      toast("Vloženo.");
+    } catch {
+      inputDetails.open = true;
+      toast("Nelze číst schránku – vlož ručně Ctrl+V.");
+    }
+  });
+
+  btnBuild.addEventListener("click", rebuildFromInput);
+
+  daySelect.addEventListener("change", ()=>{
+    const d = daySelect.value === "D2" ? "D2" : "D1";
+    switchDay(d);
+  });
+
+  startAM_A.addEventListener("change", recalcAll);
+  startAM_B.addEventListener("change", recalcAll);
+  startPM_A.addEventListener("change", recalcAll);
+  startPM_B.addEventListener("change", recalcAll);
+
+  btnResetSchedules.addEventListener("click", ()=>{
+    persistDomToState();
+
+    const rowsToReturn = [];
+    for(const day of DAYS){
+      for(const block of BLOCKS){
+        for(const cls of state.classes){
+          const rows = state.schedulesData[day][block][cls] || [];
+          for(const r of rows) rowsToReturn.push(r);
+          state.schedulesData[day][block][cls] = [];
+        }
+      }
+    }
+
+    renderSchedulesForDay(currentDay);
+    for(const row of rowsToReturn) addPoolRow(row);
+
+    recalcAll();
+    toast("Vyprázdněno.");
+  });
+
+  btnCopyAll.addEventListener("click", async ()=>{
+    try{
+      await navigator.clipboard.writeText(outputEl.value);
+      toast("Zkopírováno.");
+    } catch {
+      outputEl.focus(); outputEl.select();
+      toast("Vybráno – Ctrl+C.");
+    }
+  });
+
+  btnDownloadAll.addEventListener("click", ()=>{
+    const blob = new Blob([outputEl.value], {type:"text/tab-separated-values;charset=utf-8"});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    const stamp = new Date().toISOString().slice(0,19).replace(/[:T]/g,"-");
+    a.href = url;
+    a.download = `rozpis-maturit-export-${stamp}.tsv`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+    toast("Staženo.");
+  });
+
+  btnSaveState.addEventListener("click", ()=>{
+    const obj = buildStateObject();
+    const stamp = new Date().toISOString().slice(0,19).replace(/[:T]/g,"-");
+    downloadJson(`rozpis-maturit-stav-${stamp}.json`, obj);
+    toast("Uloženo.");
+  });
+
+  btnLoadState.addEventListener("click", ()=>{
+    fileState.value = "";
+    fileState.click();
+  });
+
+  fileState.addEventListener("change", async ()=>{
+    const file = fileState.files?.[0];
+    if(!file) return;
+    try{
+      const obj = JSON.parse(await file.text());
+      applyLoadedState(obj);
+      toast("Načteno.");
+    } catch (e){
+      console.error(e);
+      toast("Nelze načíst soubor.");
+    }
+  });
+
+  btnQuickSave.addEventListener("click", quickSave);
+  btnQuickLoad.addEventListener("click", quickLoad);
+  btnQuickClear.addEventListener("click", quickClear);
+
+  inputEl.addEventListener("input", updateInputMeta);
+
+  // init
+  updateInputMeta();
+  updateQuickButtons();
+  rebuildScheduleTeacherOptions();
+  applyCollapseUI();
+</script>
+</body>
+</html>
